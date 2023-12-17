@@ -14,8 +14,8 @@ Personal photo library management scripts.
 
 Install for example with [pipx](https://github.com/pypa/pipx):
 
-  git clone https://github.com/rthome/archivist.git
-  cd archivist
-  pipx install .
+    git clone https://github.com/rthome/archivist.git
+    cd archivist
+    pipx install .
 
 That will download dependencies and make the application available globally (or at least for the current user).
