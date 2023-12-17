@@ -11,7 +11,9 @@ classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
 requires-python = ">=3.12"
 dependencies = [
-    "click >=8.1"
+    "click >=8.1",
+    "exif >=1.6",
+    "plotly >=5.18"
 ]
 
 [project.urls]
