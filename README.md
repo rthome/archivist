@@ -1,10 +1,10 @@
 # Archivist
 
-Personal photo library management scripts.
+Personal photo library management scripts (in Python).
 
 ## Scripts
 
-- canonize: Sort image files into archive folder.
+- canonize: Sort image files into an archive folder.
 - clean: Remove RAW files whose paired JPEGs have been deleted.
 - plot: Create a simple plot of focal length distribution for folders of images.
 
