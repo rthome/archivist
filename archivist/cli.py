@@ -18,12 +18,15 @@ def cli():
 @click.option("-o", "--files-only", is_flag=True, help="Only process file paths, ignore any given directory paths")
 @click.option("-r", "--recurse", is_flag=True, help="Read image files recursively from any given directories")
 def canonize(files: Iterable[pathlib.Path], archive: pathlib.Path, test: bool, move: bool, files_only: bool, recurse: bool):
+    """Collect image files and sort them into an archive folder, according to their capture date and time."""
     canonize_command.canonize(archive, files, move, files_only, recurse, test)
 
 @cli.command()
 def clean():
+    """Clean up raw image files whose paired jpegs have been deleted."""
     pass
 
 @cli.command()
 def plot():
+    """Plot focal length distribution of image files."""
     pass

@@ -26,14 +26,13 @@ def read_datetime(file: pathlib.Path) -> datetime.datetime | None:
 
 def process_input_files(image_files: Iterable[pathlib.Path]) -> Iterable[ImportFile]:
     import_files = []
-    with click.progressbar(image_files, label="Reading EXIF tags") as bar:
-        for image_file in bar:
-            capture_time = read_datetime(image_file)
-            if capture_time is None:
-                click.echo(utils.CC.warn(f"No capture time on file '{image_file}' - skipping."))
-                continue
-            import_files.append(ImportFile(image_file, capture_time))
-        return import_files
+    for image_file in image_files:
+        capture_time = read_datetime(image_file)
+        if capture_time is None:
+            click.echo(utils.warn_str(f"No capture time on file '{image_file}' - skipping."))
+            continue
+        import_files.append(ImportFile(image_file, capture_time))
+    return import_files
 
 def make_import_operations(archive: pathlib.Path, files: Iterable[ImportFile]) -> Iterable[ImportOperation]:
     def normalize_suffix(file: pathlib.Path):
@@ -45,11 +44,13 @@ def make_import_operations(archive: pathlib.Path, files: Iterable[ImportFile]) -
     import_operations = []
     name_counts = dict()
     for file in files:
-        canonical_file_name = file.capture_time.strftime("%Y%m%d_%H_%M_%S") + file.suffix.lower()
+        name = file.capture_time.strftime("%Y%m%d_%H_%M_%S")
+        suffix = file.path.suffix.lower()
+        canonical_file_name = name + suffix
         if canonical_file_name in name_counts:
             ncount = name_counts[canonical_file_name]
             name_counts[canonical_file_name] += 1
-            canonical_file_name = file.capture_time.strftime("%Y%m%d_%H_%M_%S") + f"-{ncount}" + file.suffix.lower()
+            canonical_file_name = name + f"-{ncount}" + suffix
         else:
             name_counts[canonical_file_name] = 1
         canonical_path = normalize_suffix(archive / file.capture_time.strftime("%Y") / file.capture_time.strftime("%m") / canonical_file_name)
@@ -57,18 +58,18 @@ def make_import_operations(archive: pathlib.Path, files: Iterable[ImportFile]) -
     return import_operations
 
 def perform_import(import_operations: Iterable[ImportOperation], move_files: bool, test_only: bool) -> None:
-    operation = utils.CC.orange("MOVE" if move_files else "COPY")
+    operation = utils.emphasis_str("MOVE" if move_files else "COPY")
     if test_only:
-        operation = utils.CC.orange("TEST") + " " + operation
-    with click.progressbar(import_operations, label="Importing") as bar:
-        for import_op in bar:
-            click.echo(f"{operation} {import_op.original_path} {utils.CC.orange("TO")} {import_op.canonical_path}")
+        operation = utils.emphasis_str("TEST") + " " + operation
+        for op in import_operations:
+            click.echo(f"{operation} {op.original_path} {utils.emphasis_str("TO")} {op.canonical_path}...", nl=False)
             if not test_only:
-                if not import_op.canonical_path.parent.exists():
-                    import_op.canonical_path.parent.mkdir(parents=True)
-                shutil.copy2(import_op.original_path, import_op.canonical_path)
+                if not op.canonical_path.parent.exists():
+                    op.canonical_path.parent.mkdir(parents=True)
+                shutil.copy2(op.original_path, op.canonical_path)
                 if move_files:
-                    import_op.original_path.unlink()
+                    op.original_path.unlink()
+            click.echo(utils.emphasis_str("OK"))
 
 def canonize(archive: pathlib.Path,
              import_items: Iterable[pathlib.Path],
@@ -76,9 +77,10 @@ def canonize(archive: pathlib.Path,
              files_only: bool,
              recursive_search: bool,
              test_only: bool) -> None:
-    if not archive.is_dir() or not archive.exists():
-        click.echo(utils.CC.error("Archive path not a directory or doesn't exist. Exiting."))
-        return
+    if not archive.exists():
+        click.echo(f"{utils.emphasis_str("NOTE")}: Archive directory doesn't exist. Creating directory '{archive.absolute()}'.")
+        if not test_only:
+            archive.mkdir(parents=True)
     
     click.echo("Collecting files... ", nl=False)
     image_files = list(utils.collect_image_files(import_items, files_only, recursive_search, utils.IMAGE_EXTS))

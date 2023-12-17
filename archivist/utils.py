@@ -14,35 +14,14 @@ FILE_EXT_NORMALIZATIONS = dict([
     (".heic", ".heif")
 ])
 
-class CC(object):
-    X = '\033[0m'  # clear
-    O = '\033[33m' # orange
-    R = '\033[31m' # red
-    Y = '\033[93m' # yellow
+def warn_str(s: str) -> str:
+    return f"{click.style("WARNING", fg="yellow")}: {s}"
 
-    @classmethod
-    def _fmt(cls, color, s):
-        return color + str(s) + cls.X
+def error_str(s: str) -> str:
+    return f"{click.style("ERROR", fg="red")}: {s}"
 
-    @classmethod
-    def red(cls, s):
-        return cls._fmt(cls.R, s)
-    
-    @classmethod
-    def orange(cls, s):
-        return cls._fmt(cls.O, s)
-
-    @classmethod
-    def yellow(cls, s):
-        return cls._fmt(cls.Y, s)
-    
-    @classmethod
-    def warn(cls, s: str) -> str:
-        return f"{CC.yellow("Warning")}: {s}"
-    
-    def error(cls, s: str) -> str:
-        return f"{CC.red("Error")}: {s}"
-    
+def emphasis_str(s: str) -> str:
+    return click.style(s, fg="blue")
 
 def collect_image_files(paths: Iterable[pathlib.Path], files_only=False, recurse=False, accepted_suffixes=IMAGE_EXTS) -> Iterable[pathlib.Path]:
     for path in paths:
@@ -66,5 +45,5 @@ def read_exif_tag(file: pathlib.Path, tag: str) -> str | None:
             else:
                 return None
         except:
-            click.echo(CC.warn(f"Unable to read EXIF tags on file '{file}'"))
+            click.echo(warn_str(f"Unable to read EXIF tags on file '{file}'"))
             return None
