@@ -34,7 +34,7 @@ def collect_image_files(paths: Iterable[pathlib.Path], files_only=False, recurse
             if files_only:
                 continue
             else:
-                yield from collect_image_files(path.iterdir(), not recurse, recurse)
+                yield from collect_image_files(path.iterdir(), not recurse, recurse, accepted_suffixes=accepted_suffixes)
 
 def read_exif_tag(file: pathlib.Path, tag: str) -> str | None:
     with file.open("rb") as fo:
