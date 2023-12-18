@@ -6,6 +6,7 @@ Personal photo library management scripts (in Python).
 
 - canonize: Sort image files into an archive folder.
 - clean: Remove RAW files whose paired JPEGs have been deleted.
+- count: Count image files
 - plot: Create a simple plot of focal length distribution for folders of images.
 
 ## Install
