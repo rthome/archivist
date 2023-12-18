@@ -18,4 +18,7 @@ Install for example with [pipx](https://github.com/pypa/pipx):
     cd archivist
     pipx install .
 
-That will download dependencies and make the application available globally (or at least for the current user).
+That will download dependencies and make the application available globally (or at least for the current user). Now, get started with
+
+    archivist --help
+
