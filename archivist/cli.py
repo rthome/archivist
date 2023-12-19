@@ -10,6 +10,7 @@ from . import plot_command
 
 
 @click.group()
+@click.version_option()
 def cli():
     pass
 
