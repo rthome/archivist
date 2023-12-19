@@ -28,9 +28,8 @@ def canonize(files: Iterable[pathlib.Path], archive: pathlib.Path, test: bool, m
 @cli.command()
 @click.argument("processed_images_dir", nargs=1, default=".", type=click.Path(exists=True, file_okay=False, path_type=pathlib.Path))
 @click.option("-d", "--raw-dir", type=click.Path(exists=True, file_okay=False, path_type=pathlib.Path), help="Directory containing RAW image files to be cleaned up")
-@click.option("-r", "--recurse", is_flag=True, help="Read image files recursively from any given directories")
 @click.option("-t", "--test", is_flag=True, help="Print proposed actions, but don't actually do anything")
-def clean(processed_images_dir: pathlib.Path, raw_dir: pathlib.Path | None, recurse: bool, test: bool):
+def clean(processed_images_dir: pathlib.Path, raw_dir: pathlib.Path | None, test: bool):
     """
     Clean up raw image files whose paired jpegs have been deleted.
 
@@ -38,7 +37,7 @@ def clean(processed_images_dir: pathlib.Path, raw_dir: pathlib.Path | None, recu
     If --raw-dir isn't given, this command will look for a suitable folder of RAW images -
     such as a subfolder of the PROCESSED_IMAGES_DIR named "raw".
     """
-    clean_command.clean(processed_images_dir, raw_dir, recurse, test)
+    clean_command.clean(processed_images_dir, raw_dir, test)
 
 @cli.command()
 @click.argument("paths", nargs=-1, type=click.Path(exists=True, path_type=pathlib.Path))
