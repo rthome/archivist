@@ -20,14 +20,6 @@ class SuffixStats:
         return f"TOTAL: {self.total_count}"
 
 
-def normalize_suffixes(files: Iterable[pathlib.Path]) -> Iterable[pathlib.Path]:
-    for file in files:
-        file = file.with_suffix(file.suffix.lower())
-        if file.suffix in utils.FILE_EXT_NORMALIZATIONS:
-            yield file.with_suffix(utils.FILE_EXT_NORMALIZATIONS[file.suffix])
-        else:
-            yield file
-
 def collect_file_suffix_stats(files: Iterable[pathlib.Path]) -> SuffixStats:
     suffixes = (file.suffix for file in files)
     suffix_counter = Counter(suffixes)
@@ -36,7 +28,7 @@ def collect_file_suffix_stats(files: Iterable[pathlib.Path]) -> SuffixStats:
 def count(paths: Iterable[pathlib.Path], normalize: bool):
     image_files = utils.collect_image_files(paths, recurse=True)
     if normalize:
-        image_files = normalize_suffixes(image_files)
+        image_files = map(utils.normalize_suffix, image_files)
     stats = collect_file_suffix_stats(image_files)
     click.echo(stats.format_suffixes())
     click.echo(stats.format_total())

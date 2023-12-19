@@ -17,6 +17,7 @@ class ImportFile:
     path: pathlib.Path
     capture_time: datetime.datetime
 
+
 def read_datetime(file: pathlib.Path) -> datetime.datetime | None:
     exif_data = utils.read_exif_tag(file, "datetime_original")
     if exif_data is None:
@@ -25,25 +26,17 @@ def read_datetime(file: pathlib.Path) -> datetime.datetime | None:
         return datetime.datetime.strptime(exif_data, "%Y:%m:%d %H:%M:%S")
 
 def process_input_files(image_files: Iterable[pathlib.Path]) -> Iterable[ImportFile]:
-    import_files = []
-    for image_file in image_files:
-        capture_time = read_datetime(image_file)
+    def process_file(file: pathlib.Path) -> ImportFile:
+        capture_time = read_datetime(file)
         if capture_time is None:
-            click.echo(utils.warn_str(f"No capture time on file '{image_file}' - skipping."))
-            continue
-        import_files.append(ImportFile(image_file, capture_time))
-    return import_files
+            click.echo(utils.warn_str(f"No capture time on file '{file}' - skipping."))
+            return None
+        return ImportFile(file, capture_time)
+    
+    return list(filter(bool, map(process_file, image_files)))
 
 def make_import_operations(archive: pathlib.Path, files: Iterable[ImportFile]) -> Iterable[ImportOperation]:
-    def normalize_suffix(file: pathlib.Path):
-        if file.suffix.lower() in utils.FILE_EXT_NORMALIZATIONS:
-            return file.with_suffix(utils.FILE_EXT_NORMALIZATIONS[file.suffix.lower()])
-        else:
-            return file
-    
-    import_operations = []
-    name_counts = dict()
-    for file in files:
+    def make_operation(file: pathlib.Path, name_counts: dict[pathlib.Path, int]) -> ImportOperation:
         name = file.capture_time.strftime("%Y%m%d_%H_%M_%S")
         suffix = file.path.suffix.lower()
         canonical_file_name = name + suffix
@@ -53,9 +46,11 @@ def make_import_operations(archive: pathlib.Path, files: Iterable[ImportFile]) -
             canonical_file_name = name + f"-{ncount}" + suffix
         else:
             name_counts[canonical_file_name] = 1
-        canonical_path = normalize_suffix(archive / file.capture_time.strftime("%Y") / file.capture_time.strftime("%m") / canonical_file_name)
-        import_operations.append(ImportOperation(file.path, canonical_path))
-    return import_operations
+        canonical_path = utils.normalize_suffix(archive / file.capture_time.strftime("%Y") / file.capture_time.strftime("%m") / canonical_file_name)
+        return ImportOperation(file.path, canonical_path)
+    
+    name_counts = dict()
+    return [make_operation(f, name_counts) for f in files]
 
 def perform_import(import_operations: Iterable[ImportOperation], move_files: bool, test_only: bool) -> None:
     operation = utils.emphasis_str("MOVE" if move_files else "COPY")
@@ -84,7 +79,7 @@ def canonize(archive: pathlib.Path,
     
     click.echo("Collecting files... ", nl=False)
     image_files = list(utils.collect_image_files(import_items, files_only, recursive_search, utils.IMAGE_EXTS))
-    click.echo(f"found {len(image_files)} files.")
+    click.echo(f"found {len(image_files)}.")
 
     if len(image_files) == 0:
         click.echo("No files found - exiting.")
@@ -92,6 +87,8 @@ def canonize(archive: pathlib.Path,
 
     click.echo("Processing image files...")
     import_files = process_input_files(image_files)
+
+    click.echo("Planning import operation...")
     import_operations = make_import_operations(archive, import_files)
 
     click.echo("Importing files...")

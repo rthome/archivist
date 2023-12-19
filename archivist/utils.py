@@ -47,3 +47,10 @@ def read_exif_tag(file: pathlib.Path, tag: str) -> str | None:
         except:
             click.echo(warn_str(f"Unable to read EXIF tags on file '{file}'"))
             return None
+
+def normalize_suffix(file: pathlib.Path) -> pathlib.Path:
+    file = file.with_suffix(file.suffix.lower())
+    if file.suffix in FILE_EXT_NORMALIZATIONS:
+        return file.with_suffix(FILE_EXT_NORMALIZATIONS[file.suffix])
+    else:
+        return file
