@@ -66,12 +66,12 @@ def perform_import(import_operations: Iterable[ImportOperation], move_files: boo
                     op.original_path.unlink()
             click.echo(utils.emphasis_str("OK"))
 
-def canonize(archive: pathlib.Path,
-             import_items: Iterable[pathlib.Path],
-             move_files: bool,
-             files_only: bool,
-             recursive_search: bool,
-             test_only: bool) -> None:
+def import_files(archive: pathlib.Path,
+                 import_items: Iterable[pathlib.Path],
+                 move_files: bool,
+                 files_only: bool,
+                 recursive_search: bool,
+                 test_only: bool) -> None:
     if not archive.exists():
         click.echo(f"{utils.emphasis_str("NOTE")}: Archive directory doesn't exist. Creating directory '{archive.absolute()}'.")
         if not test_only:

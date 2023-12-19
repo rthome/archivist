@@ -3,7 +3,7 @@ import click
 
 from typing import Iterable
 
-from . import canonize_command
+from . import import_command
 from . import clean_command
 from . import count_command
 from . import plot_command
@@ -14,16 +14,16 @@ from . import plot_command
 def cli():
     pass
 
-@cli.command()
+@cli.command(name="import")
 @click.argument("files", nargs=-1, type=click.Path(exists=True, path_type=pathlib.Path))
 @click.option("-a", "--archive", default=".", type=click.Path(file_okay=False, path_type=pathlib.Path), help="Path to the archive directory")
 @click.option("-t", "--test", is_flag=True, help="Print proposed actions, but don't actually do anything")
 @click.option("-m", "--move", is_flag=True, help="Move files instead of copying them (CARE: deletes the originals)")
 @click.option("-o", "--files-only", is_flag=True, help="Only process file paths, ignore any given directory paths")
 @click.option("-r", "--recurse", is_flag=True, help="Read image files recursively from any given directories")
-def canonize(files: Iterable[pathlib.Path], archive: pathlib.Path, test: bool, move: bool, files_only: bool, recurse: bool):
-    """Collect image files and sort them into an archive folder, according to their capture date and time."""
-    canonize_command.canonize(archive, files, move, files_only, recurse, test)
+def import_files(files: Iterable[pathlib.Path], archive: pathlib.Path, test: bool, move: bool, files_only: bool, recurse: bool):
+    """Collect image files and import them into an archive folder, according to their capture date and time."""
+    import_command.import_files(archive, files, move, files_only, recurse, test)
 
 @cli.command()
 @click.argument("processed_images_dir", nargs=1, default=".", type=click.Path(exists=True, file_okay=False, path_type=pathlib.Path))
