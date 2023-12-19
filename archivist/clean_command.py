@@ -66,13 +66,14 @@ def clean(base_folder: pathlib.Path, raw_folder: pathlib.Path | None, test_only:
         return
     
     if raw_folder is None:
-        click.echo("No raw folder provided. Searching a suitable default... ", nl=False)
+        click.echo("No RAW folder provided. Searching a suitable default... ", nl=False)
         raw_folder = find_default_raw_folder(base_folder)
         if raw_folder is not None:
             click.echo(utils.emphasis_str("OK"))
+            click.echo(f"Using RAW folder '{raw_folder}'.")
         else:
             click.echo()
-            click.echo(utils.error_str("No suitable raw image folder found. Exiting."))
+            click.echo(utils.error_str("No suitable RAW image folder found. Exiting."))
             return
     assert raw_folder.is_dir() # This must be true after this point
 
