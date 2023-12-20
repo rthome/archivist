@@ -3,10 +3,7 @@ import click
 
 from typing import Iterable
 
-from . import import_command
-from . import clean_command
-from . import count_command
-from . import plot_command
+from . import import_command, clean_command, count_command, normalize_command, plot_command
 
 
 @click.group()
@@ -50,6 +47,18 @@ def count(paths: Iterable[pathlib.Path], normalize: bool):
     File suffixes will be normalized by default so as not to end up with a statistic full of .JPG, .jpg, .jpeg, and so on.
     """
     count_command.count(paths, normalize)
+
+@cli.command()
+@click.argument("paths", nargs=-1, type=click.Path(exists=True, path_type=pathlib.Path))
+@click.option("-r", "--recurse", is_flag=True, help="Read image files recursively from any given directories")
+@click.option("-t", "--test", is_flag=True, help="Print proposed actions, but don't actually do anything")
+def normalize(paths: Iterable[pathlib.Path], recurse: bool, test: bool):
+    """
+    Normalize file extensions by renaming (image) files (e.g. .JPG -> .jpeg), while attempting to preserve file attributes.
+    
+    Works with any number of file or directory path arguments. Everything will be renamed in-place.
+    """
+    normalize_command.normalize(paths, recurse, test)
 
 @cli.command()
 def plot():

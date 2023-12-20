@@ -8,11 +8,11 @@ from typing import Iterable
 RAW_EXTS = {".raf", ".nef", ".orf", ".rw2", ".crw", ".cr2", ".arw", ".dng"}
 PROCESSED_EXTS = {".jpeg", ".jpg", ".heif", ".hif", ".heic"}
 IMAGE_EXTS = RAW_EXTS | PROCESSED_EXTS
-FILE_EXT_NORMALIZATIONS = dict([
-    (".jpg", ".jpeg"),
-    (".hif", ".heif"),
-    (".heic", ".heif")
-])
+FILE_EXT_NORMALIZATIONS = {
+    ".jpg": ".jpeg",
+    ".hif": ".heif",
+    ".heic": ".heif",
+}
 
 def warn_str(s: str) -> str:
     return f"{click.style("WARNING", fg="yellow")}: {s}"
@@ -23,7 +23,7 @@ def error_str(s: str) -> str:
 def emphasis_str(s: str) -> str:
     return click.style(s, fg="blue")
 
-def collect_image_files(paths: Iterable[pathlib.Path], files_only=False, recurse=False, accepted_suffixes=IMAGE_EXTS) -> Iterable[pathlib.Path]:
+def collect_image_files(paths: Iterable[pathlib.Path], files_only: bool = False, recurse: bool = False, accepted_suffixes: set[str] = IMAGE_EXTS) -> Iterable[pathlib.Path]:
     for path in paths:
         if not path.exists():
             continue
