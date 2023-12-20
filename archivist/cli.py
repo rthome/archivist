@@ -61,6 +61,10 @@ def normalize(paths: Iterable[pathlib.Path], recurse: bool, test: bool):
     normalize_command.normalize(paths, recurse, test)
 
 @cli.command()
-def plot():
+@click.argument("folders", nargs=-1,  type=click.Path(exists=True, file_okay=False, path_type=pathlib.Path))
+@click.option("-o", "--out-file", type=click.Path(dir_okay=False, path_type=pathlib.Path), help="Save the generated plot to the given file path (instead of opening it straight away)")
+@click.option("-r", "--raw-only", is_flag=True, help="Only read data from raw file formats (such as .RAF, .NEF, etc.)")
+@click.option("-p", "--processed-only", is_flag=True, help="Only read data from processed file formats (such as JPEG)")
+def plot(folders: Iterable[pathlib.Path], out_file: pathlib.Path | None, raw_only: bool, processed_only: bool):
     """Plot focal length distribution of image files."""
-    pass
+    plot_command.plot(folders, out_file, raw_only, processed_only)
