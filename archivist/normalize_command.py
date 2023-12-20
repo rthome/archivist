@@ -26,7 +26,7 @@ def normalize(paths: Iterable[pathlib.Path], recurse: bool, test_only: bool):
         current_files = list(current_files)
         click.echo(f"Processing {len(current_files)} in '{current_folder}':")
         for file in current_files:
-            click.echo("\t", nl=False)
+            click.echo("  ", nl=False)
             if test_only:
                 click.echo(utils.emphasis_str("TEST "), nl=False)
             normalized_file = utils.normalize_suffix(file)
