@@ -56,15 +56,15 @@ def perform_import(import_operations: Iterable[ImportOperation], move_files: boo
     operation = utils.emphasis_str("MOVE" if move_files else "COPY")
     if test_only:
         operation = utils.emphasis_str("TEST") + " " + operation
-        for op in import_operations:
-            click.echo(f"{operation} {op.original_path} {utils.emphasis_str("TO")} {op.canonical_path}...", nl=False)
-            if not test_only:
-                if not op.canonical_path.parent.exists():
-                    op.canonical_path.parent.mkdir(parents=True)
-                shutil.copy2(op.original_path, op.canonical_path)
-                if move_files:
-                    op.original_path.unlink()
-            click.echo(utils.emphasis_str("OK"))
+    for op in import_operations:
+        click.echo(f"{operation} {op.original_path} {utils.emphasis_str("TO")} {op.canonical_path}...", nl=False)
+        if not test_only:
+            if not op.canonical_path.parent.exists():
+                op.canonical_path.parent.mkdir(parents=True)
+            shutil.copy2(op.original_path, op.canonical_path)
+            if move_files:
+                op.original_path.unlink()
+        click.echo(utils.emphasis_str("OK"))
 
 def import_files(archive: pathlib.Path,
                  import_items: Iterable[pathlib.Path],
